@@ -3,10 +3,10 @@ defmodule Alice.Handlers.GoogleImages do
 
   @url "https://www.googleapis.com/customsearch/v1"
 
-  def cse_id,     do: Application.get_env(:alice, :google_images_cse_id)
-  def cse_token,  do: Application.get_env(:alice, :google_images_cse_token)
+  def cse_id,     do: Application.get_env(:alice_google_images, :cse_id)
+  def cse_token,  do: Application.get_env(:alice_google_images, :cse_token)
   def safe_value do
-    case Application.get_env(:alice, :google_images_safe_search_level) do
+    case Application.get_env(:alice_google_images, :safe_search_level) do
       level when level in [:high, :medium, :off] -> level
       _ -> :high
     end
