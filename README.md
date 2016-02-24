@@ -66,7 +66,4 @@ config :alice, :google_images_safe_search_level, :medium # other possible values
 
 ## Usage
 
-`@alice humanity`
-> hilarity ensues
-
 Use `@alice help` for more information.
