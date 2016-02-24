@@ -1,16 +1,8 @@
 defmodule Alice.Handlers.GoogleImages do
   use Alice.Router
+  import Application, only: [get_env: 2]
 
   @url "https://www.googleapis.com/customsearch/v1"
-
-  def cse_id,     do: Application.get_env(:alice_google_images, :cse_id)
-  def cse_token,  do: Application.get_env(:alice_google_images, :cse_token)
-  def safe_value do
-    case Application.get_env(:alice_google_images, :safe_search_level) do
-      level when level in [:high, :medium, :off] -> level
-      _ -> :high
-    end
-  end
 
   route ~r/(image|img)\s+me (?<term>.+)/i, :fetch
   command ~r/(image|img)\s+me (?<term>.+)/i, :fetch
@@ -20,6 +12,7 @@ defmodule Alice.Handlers.GoogleImages do
     |> extract_term
     |> get_images
     |> select_image
+    |> test_image
     |> reply(conn)
   end
 
@@ -29,7 +22,14 @@ defmodule Alice.Handlers.GoogleImages do
     |> hd
   end
 
-  def get_images(term, http \\ HTTPoison) do
+  defp http do
+    case Mix.env do
+      :test -> FakeHTTPoison
+      _else -> HTTPoison
+    end
+  end
+
+  def get_images(term) do
     case http.get(@url, [], params: query_params(term)) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}
@@ -44,15 +44,19 @@ defmodule Alice.Handlers.GoogleImages do
   end
 
   def query_params(term) do
-    [ v: "1.0",
+    [ q: term,
+      v: "1.0",
       searchType: "image",
-      q: term,
+      cx: get_env(:alice_google_images, :cse_id),
+      key: get_env(:alice_google_images, :cse_token),
       safe: safe_value,
       fields: "items(link)",
-      rsz: 8,
-      cx: cse_id,
-      key: cse_token ]
+      rsz: 8 ]
   end
+
+  defp safe_value, do: safe_value(get_env(:alice_google_images, :safe_search_level))
+  defp safe_value(level) when level in [:high, :medium, :off], do: level
+  defp safe_value(_), do: :high
 
   defp parse_error(response) do
     response.body
@@ -70,6 +74,23 @@ defmodule Alice.Handlers.GoogleImages do
     |> Poison.decode!
     |> Map.get("items", [%{}])
     |> Enum.random
-    |> Map.get("link", "No images found")
+    |> Map.get("link")
+  end
+
+  defp test_image(nil), do: "No images found"
+  defp test_image(image) do
+    case http.get(image) do
+      {:ok, %HTTPoison.Response{status_code: 200}} -> image
+      _ -> bad_image_response
+    end
+  end
+
+  defp bad_image_response do
+    [
+      "I found an image but I'm not feeling it",
+      "Nah",
+      "You wouldn't like the results of that search anyway",
+      "You can do better than that"
+    ] |> Enum.random
   end
 end
