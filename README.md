@@ -4,16 +4,16 @@ This handler will allow Alice look up random images on Google Images
 
 ## Installation
 
-If [available in Hex](https://hex.pm/packages/alice_against_humanity), the package can be installed as:
+If [available in Hex](https://hex.pm/packages/alice_google_images), the package can be installed as:
 
-  1. Add `alice_against_humanity` to your list of dependencies in `mix.exs`:
+  1. Add `alice_google_images` to your list of dependencies in `mix.exs`:
 
     ```elixir
     defp deps do
        [
          {:websocket_client, github: "jeremyong/websocket_client"},
-         {:alice, "~> 0.1.0"},
-         {:alice_against_humanity, "~> 0.0.1"}
+         {:alice, "~> 0.2.0"},
+         {:alice_google_images, "~> 0.1.0"}
        ]
     end
     ```
@@ -24,7 +24,7 @@ If [available in Hex](https://hex.pm/packages/alice_against_humanity), the packa
     def application do
       [applications: [:alice],
         mod: {
-          Alice, [Alice.Handlers.AgainstHumanity, ...]}]
+          Alice, [Alice.Handlers.GoogleImages, ...]}]
     end
     ```
 
@@ -59,9 +59,10 @@ If you need more than that you'll have to pay.
 In your bot's `config.exs`:
 
 ```elixir
-config :alice, :google_images_cse_id, System.get_env("GOOGLE_CSE_ID")
-config :alice, :google_images_cse_token, System.get_env("GOOGLE_CSE_TOKEN")
-config :alice, :google_images_safe_search_level, :medium # other possible values are :high or :off
+config :alice_google_images,
+  cse_id: System.get_env("GOOGLE_CSE_ID"),
+  cse_token: System.get_env("GOOGLE_CSE_TOKEN"),
+  safe_search_level: :medium # other possible values are :high or :off
 ```
 
 ## Usage

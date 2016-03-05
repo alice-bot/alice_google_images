@@ -7,7 +7,8 @@ defmodule Alice.Handlers.GoogleImages do
   route ~r/(image|img)\s+me (?<term>.+)/i, :fetch
   command ~r/(image|img)\s+me (?<term>.+)/i, :fetch
 
-  def handle(conn, :fetch) do
+  @doc "`img me ____` - gets a random image from Google Images"
+  def fetch(conn) do
     conn
     |> extract_term
     |> get_images
