@@ -1,4 +1,16 @@
 defmodule Alice.Handlers.GoogleImages do
+  @moduledoc """
+  This handler will allow Alice look up random images on Google Images.
+
+  Google no longer offers an unregistered image search API. You must [set up] a
+  Google Custom Search API account.
+
+  (See the [readme] for more information.)
+
+  [set up]: https://developers.google.com/custom-search/docs/overview
+  [readme]: https://github.com/alice-bot/alice_google_images
+  """
+
   use Alice.Router
   import Application, only: [get_env: 2]
 
