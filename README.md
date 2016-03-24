@@ -12,8 +12,8 @@ If [available in Hex](https://hex.pm/packages/alice_google_images), the package 
     defp deps do
        [
          {:websocket_client, github: "jeremyong/websocket_client"},
-         {:alice, "~> 0.2.0"},
-         {:alice_google_images, "~> 0.1.0"}
+         {:alice, "~> 0.3"},
+         {:alice_google_images, "~> 0.1"}
        ]
     end
     ```
