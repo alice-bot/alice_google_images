@@ -1,6 +1,6 @@
 # AliceGoogleImages [![Hex Version](https://img.shields.io/hexpm/v/alice_google_images.svg)](https://hex.pm/packages/alice_google_images) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/alice-bot/alice_google_images.svg)](https://beta.hexfaktor.org/github/alice-bot/alice_google_images) [![Hex Downloads](https://img.shields.io/hexpm/dt/alice_google_images.svg)](https://hex.pm/packages/alice_google_images) [![License: MIT](https://img.shields.io/hexpm/l/alice_google_images.svg)](https://hex.pm/packages/alice_google_images)
 
-This handler will allow Alice look up random images on Google Images
+This handler will allow Alice to look up random images on Google Images
 
 ## Installation
 
