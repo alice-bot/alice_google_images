@@ -27,16 +27,6 @@ defmodule Alice.Handlers.GoogleImagesTest do
     :ok
   end
 
-  test "extract_term gets the term" do
-    {:ok, pattern} = GI.routes
-                     |> Enum.map(fn({p,n}) -> {n,p} end)
-                     |> Keyword.fetch(:fetch_image)
-
-    conn = Alice.Conn.make(%{text: "img me stuff"}, :slack, :state)
-           |> Alice.Conn.add_captures(pattern)
-    assert GI.extract_term(conn) == "stuff"
-  end
-
   test "get_images returns the response" do
     assert {:ok, :body} = GI.get_images(q: "good result")
   end

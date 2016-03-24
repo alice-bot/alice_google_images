@@ -13,6 +13,8 @@ defmodule Alice.Handlers.GoogleImages do
 
   use Alice.Router
   import Application, only: [get_env: 2]
+  alias HTTPoison.Response, as: HTTPResponse
+  alias HTTPoison.Error, as: HTTPError
 
   @url "https://www.googleapis.com/customsearch/v1"
 
@@ -29,18 +31,12 @@ defmodule Alice.Handlers.GoogleImages do
 
   def fetch(conn, type) do
     conn
-    |> extract_term
+    |> Conn.last_capture
     |> query_params(type)
     |> get_images
     |> select_image
     |> test_image
     |> reply(conn)
-  end
-
-  def extract_term(conn) do
-    conn.message.captures
-    |> Enum.reverse
-    |> hd
   end
 
   defp http do
@@ -51,31 +47,31 @@ defmodule Alice.Handlers.GoogleImages do
   end
 
   def query_params(term, :animated) do
-    [ fileType: "gif",
-      hq: "animated",
-      tbs: "itp:animated" ]
+    [fileType: "gif",
+     hq: "animated",
+     tbs: "itp:animated"]
     |> Keyword.merge(query_params(term, :image))
   end
   def query_params(term, :image) do
-    [ q: term,
-      v: "1.0",
-      searchType: "image",
-      cx: get_env(:alice_google_images, :cse_id),
-      key: get_env(:alice_google_images, :cse_token),
-      safe: safe_value,
-      fields: "items(link)",
-      rsz: 8 ]
+    [q: term,
+     v: "1.0",
+     searchType: "image",
+     cx: get_env(:alice_google_images, :cse_id),
+     key: get_env(:alice_google_images, :cse_token),
+     safe: safe_value,
+     fields: "items(link)",
+     rsz: 8]
   end
 
   def get_images(params) do
     case http.get(@url, [], params: params) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+      {:ok, %HTTPResponse{status_code: 200, body: body}} ->
         {:ok, body}
       {:ok, response} ->
         reason = parse_error(response)
         Logger.warn("Google Images: Something went wrong, #{reason}")
         {:error, reason}
-      {:error, %HTTPoison.Error{reason: reason}} ->
+      {:error, %HTTPError{reason: reason}} ->
         Logger.warn("Couldn't get image from Google: #{reason}")
         {:error, reason}
     end
@@ -106,18 +102,18 @@ defmodule Alice.Handlers.GoogleImages do
 
   defp test_image(nil), do: "No images found"
   defp test_image(image) do
-    case http.get(image) do
-      {:ok, %HTTPoison.Response{status_code: 200}} -> image
-      _ -> bad_image_response
-    end
+    image
+    |> http.get
+    |> test_resp(image)
   end
 
-  defp bad_image_response do
-    [
-      "I found an image but I'm not feeling it",
-      "Nah",
-      "You wouldn't like the results of that search anyway",
-      "You can do better than that"
-    ] |> Enum.random
+  defp test_resp({:ok, %HTTPResponse{status_code: 200}}, image), do: image
+  defp test_resp(_bad_response, _img) do
+    ["I found an image but I'm not feeling it",
+     "Nah",
+     "You wouldn't like the results of that search anyway",
+     "You can do better than that",
+     "This is not the image you are looking for :hand:"]
+    |> Enum.random
   end
 end
