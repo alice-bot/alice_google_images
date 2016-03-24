@@ -18,8 +18,9 @@ defmodule AliceGoogleImages.Mixfile do
 
   defp deps do
     [
+      {:credo, ">= 0.0.0", only: :dev},
       {:websocket_client, github: "jeremyong/websocket_client"},
-      {:alice, "~> 0.2.0"}
+      {:alice, "~> 0.3"}
     ]
   end
 
