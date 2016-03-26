@@ -15,6 +15,7 @@ defmodule Alice.Handlers.GoogleImages do
   import Application, only: [get_env: 2]
   alias HTTPoison.Response, as: HTTPResponse
   alias HTTPoison.Error, as: HTTPError
+  alias Alice.Conn
 
   @url "https://www.googleapis.com/customsearch/v1"
 
