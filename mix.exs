@@ -3,7 +3,7 @@ defmodule AliceGoogleImages.Mixfile do
 
   def project do
     [app: :alice_google_images,
-     version: "0.1.3",
+     version: "0.1.4",
      elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
