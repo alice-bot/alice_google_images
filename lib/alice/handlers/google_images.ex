@@ -32,15 +32,15 @@ defmodule Alice.Handlers.GoogleImages do
 
   def fetch(conn, type) do
     conn
-    |> Conn.last_capture
+    |> Conn.last_capture()
     |> query_params(type)
-    |> get_images
-    |> select_image
-    |> test_image
+    |> get_images()
+    |> select_image()
+    |> test_image()
     |> reply(conn)
   end
 
-  defp http do
+  defp http() do
     case Mix.env do
       :test -> FakeHTTPoison
       _else -> HTTPoison
@@ -59,13 +59,13 @@ defmodule Alice.Handlers.GoogleImages do
      searchType: "image",
      cx: get_env(:alice_google_images, :cse_id),
      key: get_env(:alice_google_images, :cse_token),
-     safe: safe_value,
+     safe: safe_value(),
      fields: "items(link)",
      rsz: 8]
   end
 
   def get_images(params) do
-    case http.get(@url, [], params: params) do
+    case http().get(@url, [], params: params) do
       {:ok, %HTTPResponse{status_code: 200, body: body}} ->
         {:ok, body}
       {:ok, response} ->
@@ -78,13 +78,13 @@ defmodule Alice.Handlers.GoogleImages do
     end
   end
 
-  defp safe_value, do: safe_value(get_env(:alice_google_images, :safe_search_level))
+  defp safe_value(), do: safe_value(get_env(:alice_google_images, :safe_search_level))
   defp safe_value(level) when level in [:high, :medium, :off], do: level
   defp safe_value(_), do: :high
 
   defp parse_error(response) do
     response.body
-    |> Poison.decode!
+    |> Poison.decode!()
     |> get_in(["error", "errors"])
     |> case do
       [error|_] -> Map.get(error, "reason", "unknown")
@@ -95,16 +95,16 @@ defmodule Alice.Handlers.GoogleImages do
   defp select_image({:error, reason}), do: "Error: #{reason}"
   defp select_image({:ok, body}) do
     body
-    |> Poison.decode!
+    |> Poison.decode!()
     |> Map.get("items", [%{}])
-    |> Enum.random
+    |> Enum.random()
     |> Map.get("link")
   end
 
   defp test_image(nil), do: "No images found"
   defp test_image(image) do
     image
-    |> http.get
+    |> http().get()
     |> test_resp(image)
   end
 
@@ -115,6 +115,6 @@ defmodule Alice.Handlers.GoogleImages do
      "You wouldn't like the results of that search anyway",
      "You can do better than that",
      "This is not the image you are looking for :hand:"]
-    |> Enum.random
+    |> Enum.random()
   end
 end
